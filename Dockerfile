@@ -1,30 +1,29 @@
 FROM php:8.2-fpm
 
-# 必要な拡張のインストール
+# 必要なPHP拡張とツールをインストール
 RUN apt-get update && apt-get install -y \
     git unzip zip curl libzip-dev libonig-dev libsqlite3-dev \
     && docker-php-ext-install pdo pdo_sqlite mbstring zip
 
-# Composerを追加
+# Composer追加
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# アプリ作業ディレクトリ
+# 作業ディレクトリ
 WORKDIR /var/www
 
 # アプリコードをコピー
 COPY . .
 
-# SQLite DBファイルの作成と環境設定
+# SQLite対応：.env作成＆DBファイル作成
 RUN cp .env.example .env \
-    && touch /tmp/sqlite.db \
-    && php artisan config:clear \
-    && php artisan key:generate
+    && touch /tmp/sqlite.db
 
-# Composer依存をインストール
+# Laravelの依存インストール
 RUN composer install --no-dev --optimize-autoloader
 
-# ポートを開ける
-EXPOSE 10000
+# Laravel初期化は CMD で実行（起動時）
+CMD php artisan config:clear \
+ && php artisan key:generate \
+ && php artisan serve --host=0.0.0.0 --port=10000
 
-# サーバー起動コマンド
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
+EXPOSE 10000
