@@ -21,9 +21,7 @@ RUN cp .env.example .env \
 # Laravelの依存インストール
 RUN composer install --no-dev --optimize-autoloader
 
-# Laravel初期化は CMD で実行（起動時）
-CMD php artisan config:clear \
- && php artisan key:generate \
- && php artisan serve --host=0.0.0.0 --port=10000
+# Laravel初期化は起動時に（APP_KEYなければ生成）
+CMD ["/bin/sh", "-c", "if [ ! -f /var/www/storage/oauth-private.key ]; then php artisan key:generate; fi && php artisan serve --host=0.0.0.0 --port=10000"]
 
 EXPOSE 10000
