@@ -6,6 +6,8 @@ use App\Models\Category;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Schema;  // 追加
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,9 +28,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Paginator::useBootstrapFive();
-        Paginator::useBootstrapFour();
-        View::share('categories', $this->shareCategories());
+         Paginator::useBootstrapFive();
+         Paginator::useBootstrapFour();
+
+         if (Schema::hasTable('categories')) {
+             View::share('categories', $this->shareCategories());
+         }
     }
 
     private function shareCategories(){
