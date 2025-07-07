@@ -14,9 +14,9 @@ WORKDIR /var/www
 # アプリコードをコピー
 COPY . .
 
-# SQLite対応：.env作成＆DBファイル作成
 RUN cp .env.example .env \
-    && touch /tmp/sqlite.db
+    && touch /var/www/sqlite.db \
+    && composer install --no-dev --optimize-autoloader
 
 # Laravelの依存インストール
 RUN composer install --no-dev --optimize-autoloader
