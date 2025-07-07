@@ -14,14 +14,15 @@ WORKDIR /var/www
 # アプリコードをコピー
 COPY . .
 
-# .envとDB作成、依存インストール
+# .envとSQLiteファイルの準備
 RUN cp .env.example .env \
     && touch /var/www/sqlite.db \
     && composer install --no-dev --optimize-autoloader
 
-# Laravel初期化とサーバ起動
+# 初期化とサーバ起動
 CMD php artisan config:clear \
  && php artisan key:generate \
+ && php artisan migrate --force \
  && php artisan serve --host=0.0.0.0 --port=10000
 
 EXPOSE 10000
